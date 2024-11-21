@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
@@ -79,12 +81,14 @@ fun TodoScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        // Title
         Text(
             text = "ToDoSlav",
             fontSize = 24.sp,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
+        // Input Field and Add Button
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -106,11 +110,16 @@ fun TodoScreen(
             }
         }
 
-        Column(
-            modifier = Modifier.verticalScroll(rememberScrollState())
+        // Task List
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize() // Allow LazyColumn to take up the remaining space
         ) {
-            for (task in tasks) {
-                TaskItem(task = task, onDelete = { onTaskDelete(task) })
+            items(tasks.toList()) { task ->
+                TaskItem(
+                    task = task,
+                    onDelete = { onTaskDelete(task) }
+                )
             }
         }
     }
@@ -121,8 +130,8 @@ fun TaskItem(task: String, onDelete: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .padding(vertical = 4.dp)
             .fillMaxWidth()
+            .padding(vertical = 4.dp)
     ) {
         Text(
             text = task,
