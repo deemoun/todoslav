@@ -1,15 +1,14 @@
 package com.deemoun.todoapp
 
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -17,7 +16,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,6 +28,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     private lateinit var dataStoreManager: DataStoreManager
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -38,15 +37,40 @@ class MainActivity : ComponentActivity() {
         setContent {
             ToDoAppTheme {
                 var tasks by remember { mutableStateOf(setOf<String>()) }
+                var isLinkToggleEnabled by remember { mutableStateOf(false) }
 
                 // Load tasks on app startup
                 LaunchedEffect(Unit) {
-                    dataStoreManager.tasks.collect { savedTasks ->
-                        tasks = savedTasks
+                    lifecycleScope.launch {
+                        dataStoreManager.tasks.collect { savedTasks ->
+                            tasks = savedTasks
+                        }
                     }
                 }
 
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    topBar = {
+                        TopAppBar(
+                            title = { Text("ToDoSlav") },
+                            actions = {
+                                // Add the toggle
+                                Switch(
+                                    checked = isLinkToggleEnabled,
+                                    onCheckedChange = {
+                                        isLinkToggleEnabled = it
+                                        // Show a toast when toggled
+                                        Toast.makeText(
+                                            this@MainActivity,
+                                            "Link toggle is pressed",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                )
+                            }
+                        )
+                    }
+                ) { innerPadding ->
                     TodoScreen(
                         tasks = tasks,
                         onTaskAdd = { newTask ->
@@ -88,13 +112,6 @@ fun TodoScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Title
-        Text(
-            text = "ToDoSlav",
-            fontSize = 24.sp,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
         // Input Field and Add Button
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -117,6 +134,7 @@ fun TodoScreen(
                 if (newTask.isNotBlank()) {
                     onTaskAdd(newTask)
                     newTask = ""
+                    Log.d("TodoApp","Task item added")
                     focusManager.clearFocus() // Collapse keyboard after adding a task
                 }
             }) {
@@ -128,12 +146,14 @@ fun TodoScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f) // Ensures LazyColumn gets remaining space and allows scrolling
         ) {
             items(tasks.toList()) { task ->
                 TaskItem(
                     task = task,
-                    onDelete = { onTaskDelete(task) }
+                    onDelete = {
+                        Log.d("TodoApp","Task item deleted")
+                        onTaskDelete(task)
+                    }
                 )
             }
         }
