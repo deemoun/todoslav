@@ -55,14 +55,12 @@ class MainActivity : ComponentActivity() {
                         TopAppBar(
                             title = { Text("ToDoSlav") },
                             actions = {
-                                // Add the toggle
-                                Switch(
-                                    checked = isLinkToggleEnabled,
-                                    onCheckedChange = {
-                                        isLinkToggleEnabled = it
-                                        startActivity(Intent(this@MainActivity, LinksActivity::class.java))
-                                    }
-                                )
+                                // Replace Switch with Button styled as a "link"
+                                TextButton(onClick = {
+                                    startActivity(Intent(this@MainActivity, LinksActivity::class.java))
+                                }) {
+                                    Text("Links", style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary))
+                                }
                             }
                         )
                     }
