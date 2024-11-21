@@ -1,5 +1,6 @@
 package com.deemoun.todoapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -59,12 +60,7 @@ class MainActivity : ComponentActivity() {
                                     checked = isLinkToggleEnabled,
                                     onCheckedChange = {
                                         isLinkToggleEnabled = it
-                                        // Show a toast when toggled
-                                        Toast.makeText(
-                                            this@MainActivity,
-                                            "Link toggle is pressed",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        startActivity(Intent(this@MainActivity, LinksActivity::class.java))
                                     }
                                 )
                             }
