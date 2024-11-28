@@ -3,7 +3,6 @@ package com.deemoun.todoapp
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -18,7 +17,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,7 +40,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             ToDoAppTheme {
                 var tasks by remember { mutableStateOf(setOf<String>()) }
-                var isLinkToggleEnabled by remember { mutableStateOf(false) }
 
                 // Load tasks on app startup
                 LaunchedEffect(Unit) {
@@ -55,11 +56,18 @@ class MainActivity : ComponentActivity() {
                         TopAppBar(
                             title = { Text("ToDoSlav") },
                             actions = {
-                                // Replace Switch with Button styled as a "link"
-                                TextButton(onClick = {
-                                    startActivity(Intent(this@MainActivity, LinksActivity::class.java))
-                                }) {
-                                    Text("Links", style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary))
+                                TextButton(
+                                    onClick = {
+                                        startActivity(Intent(this@MainActivity, LinksActivity::class.java))
+                                    },
+                                    Modifier.semantics { contentDescription = "LinksButton" }
+                                ) {
+                                    Text(
+                                        "Links",
+                                        style = MaterialTheme.typography.bodyLarge.copy(
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    )
                                 }
                             }
                         )
@@ -114,41 +122,59 @@ fun TodoScreen(
             OutlinedTextField(
                 value = newTask,
                 onValueChange = { newTask = it },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .semantics { contentDescription = "EnterTaskField" },
                 label = { Text("Enter task") },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
-                    onDone = { focusManager.clearFocus() } // Collapse keyboard on pressing Done
+                    onDone = { focusManager.clearFocus() }
                 )
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Button(onClick = {
-                if (newTask.isNotBlank()) {
-                    onTaskAdd(newTask)
-                    newTask = ""
-                    Log.d("TodoApp","Task item added")
-                    focusManager.clearFocus() // Collapse keyboard after adding a task
-                }
-            }) {
+            Button(
+                onClick = {
+                    if (newTask.isNotBlank()) {
+                        onTaskAdd(newTask)
+                        newTask = ""
+                        Log.d("TodoApp", "Task item added")
+                        focusManager.clearFocus()
+                    }
+                },
+                Modifier.semantics { contentDescription = "AddButton" }
+            ) {
                 Text("Add")
             }
         }
 
-        // Task List
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            items(tasks.toList()) { task ->
-                TaskItem(
-                    task = task,
-                    onDelete = {
-                        Log.d("TodoApp","Task item deleted")
-                        onTaskDelete(task)
-                    }
-                )
+        // Task List or Placeholder
+        if (tasks.isEmpty()) {
+            Text(
+                text = "Add a first task",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+                    .semantics { contentDescription = "EmptyTaskList" },
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                textAlign = TextAlign.Center // Corrected alignment here
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                items(tasks.toList()) { task ->
+                    TaskItem(
+                        task = task,
+                        onDelete = {
+                            Log.d("TodoApp", "Task item deleted")
+                            onTaskDelete(task)
+                        }
+                    )
+                }
             }
         }
     }
@@ -167,7 +193,10 @@ fun TaskItem(task: String, onDelete: () -> Unit) {
             modifier = Modifier.weight(1f),
             fontSize = 18.sp
         )
-        Button(onClick = onDelete) {
+        Button(
+            onClick = onDelete,
+            Modifier.semantics { contentDescription = "DeleteButton" }
+        ) {
             Text("Delete")
         }
     }
@@ -178,7 +207,7 @@ fun TaskItem(task: String, onDelete: () -> Unit) {
 fun TodoScreenPreview() {
     ToDoAppTheme {
         TodoScreen(
-            tasks = setOf("Task 1", "Task 2"),
+            tasks = emptySet(), // Show empty state
             onTaskAdd = {},
             onTaskDelete = {}
         )

@@ -1,52 +1,58 @@
+import android.content.Context
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.test.platform.app.InstrumentationRegistry
 import com.deemoun.todoapp.MainActivity
 import org.junit.Before
+import org.junit.FixMethodOrder
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runners.MethodSorters
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING) // Forces tests to run in alphabetical order
 class MainActivityInstrumentedTest {
 
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<MainActivity>()
-
+    val driver = createAndroidComposeRule<MainActivity>()
 
     @Test
-    fun testAddTask() {
+    fun test01_DeleteFirstTask() { // Renamed to ensure it runs first
+        // Add a task
+        //val taskInputField = driver.onNodeWithText("Enter task")
+        val taskInputField = driver.onNodeWithContentDescription("EnterTaskField")
+        val addButton = driver.onNodeWithContentDescription("AddButton")
+        taskInputField.performTextInput("Task1")
+        addButton.performClick()
+
+        // Wait for the UI to update
+        driver.waitForIdle()
+
+        // Verify the task is removed
+        driver.onAllNodesWithContentDescription("DeleteButton")[0].performClick()
+
+        driver.waitForIdle()
+
+        driver.onAllNodesWithContentDescription("EmptyTaskList").onFirst().assertExists()
+    }
+
+    @Test
+    fun test02_AddTask() { // Renamed to ensure correct order
         // Find the input field and add button
-        val taskInputField = composeTestRule.onNodeWithText("Enter task")
-        val addButton = composeTestRule.onNodeWithText("Add")
+        val taskInputField = driver.onNodeWithContentDescription("EnterTaskField")
+        val addButton = driver.onNodeWithContentDescription("AddButton")
 
         // Add a task
         taskInputField.performTextInput("Test Task")
         addButton.performClick()
 
         // Verify the task is added
-        composeTestRule.onNodeWithText("Test Task").assertExists()
+        driver.onNodeWithText("Test Task").assertExists()
     }
 
     @Test
-    fun testDeleteFirstTask() {
-        // TODO: Fix the test. Currently it doesn't really checks if it was removed
-        // Add multiple tasks
-        val taskInputField = composeTestRule.onNodeWithText("Enter task")
-        val addButton = composeTestRule.onNodeWithText("Add")
-        taskInputField.performTextInput("Task 1")
-        addButton.performClick()
-
-        // Delete the first task
-        composeTestRule.onAllNodesWithText("Delete")[0].performClick()
-
-        // Verify the task is removed
-        composeTestRule.onAllNodesWithText("Delete")[0].assertExists()
-    }
-
-    @Test()
-    fun testUIComponents() {
+    fun test03_UIComponents() { // Renamed to ensure correct order
         // Check if all key components are displayed
-        composeTestRule.onNodeWithText("Enter task").assertExists()
-        composeTestRule.onNodeWithText("Add").assertExists()
-        composeTestRule.onNodeWithText("Links").assertExists()
+        driver.onNodeWithContentDescription("EnterTaskField").assertExists()
+        driver.onNodeWithContentDescription("AddButton").assertExists()
+        driver.onNodeWithContentDescription("LinksButton").assertExists()
     }
 }
