@@ -14,45 +14,47 @@ class MainActivityInstrumentedTest {
     @get:Rule
     val driver = createAndroidComposeRule<MainActivity>()
 
+    // Common locators for all tests
+    private val taskInputField by lazy { driver.onNodeWithContentDescription("EnterTaskField") }
+    private val addButton by lazy { driver.onNodeWithContentDescription("AddButton") }
+    private val deleteButton by lazy { driver.onAllNodesWithContentDescription("DeleteButton") }
+    private val emptyTaskList by lazy { driver.onAllNodesWithContentDescription("EmptyTaskList") }
+    private val linksButton by lazy { driver.onNodeWithContentDescription("LinksButton") }
+
     @Test
-    fun test01_DeleteFirstTask() { // Renamed to ensure it runs first
+    fun test01_DeleteFirstTask() {
         // Add a task
-        //val taskInputField = driver.onNodeWithText("Enter task")
-        val taskInputField = driver.onNodeWithContentDescription("EnterTaskField")
-        val addButton = driver.onNodeWithContentDescription("AddButton")
         taskInputField.performTextInput("Task1")
         addButton.performClick()
 
         // Wait for the UI to update
         driver.waitForIdle()
 
-        // Verify the task is removed
-        driver.onAllNodesWithContentDescription("DeleteButton")[0].performClick()
+        // Delete the task
+        deleteButton[0].performClick()
 
+        // Wait for the UI to update
         driver.waitForIdle()
 
-        driver.onAllNodesWithContentDescription("EmptyTaskList").onFirst().assertExists()
+        // Verify that the task list is empty
+        emptyTaskList.onFirst().assertExists()
     }
 
     @Test
-    fun test02_AddTask() { // Renamed to ensure correct order
-        // Find the input field and add button
-        val taskInputField = driver.onNodeWithContentDescription("EnterTaskField")
-        val addButton = driver.onNodeWithContentDescription("AddButton")
-
+    fun test02_AddTask() {
         // Add a task
-        taskInputField.performTextInput("Test Task")
+        taskInputField.performTextInput("TestTask")
         addButton.performClick()
 
         // Verify the task is added
-        driver.onNodeWithText("Test Task").assertExists()
+        driver.onNodeWithText("TestTask").assertExists()
     }
 
     @Test
-    fun test03_UIComponents() { // Renamed to ensure correct order
+    fun test03_UIComponents() {
         // Check if all key components are displayed
-        driver.onNodeWithContentDescription("EnterTaskField").assertExists()
-        driver.onNodeWithContentDescription("AddButton").assertExists()
-        driver.onNodeWithContentDescription("LinksButton").assertExists()
+        taskInputField.assertExists()
+        addButton.assertExists()
+        linksButton.assertExists()
     }
 }
