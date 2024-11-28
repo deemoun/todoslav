@@ -1,5 +1,6 @@
 package com.deemoun.todoapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -54,19 +55,12 @@ class MainActivity : ComponentActivity() {
                         TopAppBar(
                             title = { Text("ToDoSlav") },
                             actions = {
-                                // Add the toggle
-                                Switch(
-                                    checked = isLinkToggleEnabled,
-                                    onCheckedChange = {
-                                        isLinkToggleEnabled = it
-                                        // Show a toast when toggled
-                                        Toast.makeText(
-                                            this@MainActivity,
-                                            "Link toggle is pressed",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                )
+                                // Replace Switch with Button styled as a "link"
+                                TextButton(onClick = {
+                                    startActivity(Intent(this@MainActivity, LinksActivity::class.java))
+                                }) {
+                                    Text("Links", style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary))
+                                }
                             }
                         )
                     }

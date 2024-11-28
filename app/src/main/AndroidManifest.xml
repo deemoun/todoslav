@@ -23,6 +23,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".LinksActivity"
+            android:exported="true"
+            android:label="Links"
+            android:theme="@style/Theme.ToDoApp" />
+
     </application>
 
 </manifest>
