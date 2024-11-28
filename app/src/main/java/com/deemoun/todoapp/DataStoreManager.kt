@@ -28,4 +28,11 @@ class DataStoreManager(private val context: Context) {
     val tasks: Flow<Set<String>> = context.dataStore.data.map { preferences ->
         preferences[TASKS_KEY] ?: emptySet()
     }
+
+    // Clear all tasks from DataStore
+    suspend fun clearTasks() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(TASKS_KEY)
+        }
+    }
 }
