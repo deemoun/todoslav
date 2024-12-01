@@ -2,6 +2,8 @@
 
 **ToDoSlav** is a lightweight task management application built using Jetpack Compose and Android DataStore. It provides an intuitive interface for creating, managing, and persisting tasks locally.
 
+**YouTube** [video lesson about the ToDoSlav app](https://www.youtube.com/watch?v=2poIKIdfSZQ) test automation (*in Russian with CC*) 
+
 ---
 
 ## Table of Contents
