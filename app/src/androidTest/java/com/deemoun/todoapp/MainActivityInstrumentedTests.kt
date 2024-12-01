@@ -27,14 +27,8 @@ class MainActivityInstrumentedTest {
         taskInputField.performTextInput("Task1")
         addButton.performClick()
 
-        // Wait for the UI to update
-        driver.waitForIdle()
-
         // Delete the task
         deleteButton[0].performClick()
-
-        // Wait for the UI to update
-        driver.waitForIdle()
 
         // Verify that the task list is empty
         emptyTaskList.onFirst().assertExists()
